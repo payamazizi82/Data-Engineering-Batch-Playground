@@ -82,3 +82,47 @@ sellers_df.filter( col("seller_state") == "SP" ).select( "seller_id", "seller_ci
 # Notes:
 # Filters sellers from São Paulo.
 # Results are sorted alphabetically by city.
+
+
+
+
+# Spark DataFrame vs Spark SQL Notes (for these queries)
+
+# 1 Spark SQL expresses logic as SQL strings executed through:
+# spark.sql("SQL QUERY")
+# while DataFrame API uses method chaining:
+# df.filter(...).select(...).orderBy(...)
+
+# 2 WHERE in SQL corresponds to:
+# .filter(...)
+
+# 3 SELECT in SQL corresponds to:
+# .select(...)
+
+# 4 ORDER BY in SQL corresponds to:
+# .orderBy(...)
+
+# 5 SQL IN (...) corresponds to:
+# .isin(...)
+
+# 6 SQL BETWEEN corresponds to:
+# .between(...)
+
+# 7 SQL functions such as:
+# YEAR(date_column)
+# become:
+# year("date_column")
+
+# 8 Comparing two columns is slightly different:
+# Spark SQL:
+# WHERE col1 > col2
+# Spark DataFrame:
+# .filter(col("col1") > col("col2"))
+
+# 9 For these eight queries, Spark SQL and DataFrame API generate very similar execution plans. 
+# Performance differences are usually negligible because both are optimized by Spark's Catalyst Optimizer.
+
+# 10 Spark SQL is often easier for users with a SQL background, while the DataFrame API is generally preferred 
+# when building larger PySpark applications because it provides better integration with Python code, variables, functions, and reusable logic.
+
+# 11 The business logic is identical in both approaches. The primary difference is the syntax used to express that logic.
