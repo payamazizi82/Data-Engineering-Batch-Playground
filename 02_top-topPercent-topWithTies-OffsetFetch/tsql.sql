@@ -134,3 +134,88 @@ OFFSET 50 ROWS; GO
 -- Demonstrates OFFSET without FETCH. 
 -- Returns all products after the first 50 sorted by weight. 
 -- Useful for paging through large datasets.
+
+
+/*
+ANSI SQL NOTES
+
+The SELECT, FROM, ORDER BY, OFFSET and FETCH clauses
+used in these queries are largely ANSI SQL compliant.
+However, the following SQL Server-specific features
+are not part of the ANSI SQL standard:
+
+1. TOP (N)
+
+    T-SQL:
+    SELECT TOP (10) ...
+
+    ANSI SQL equivalent:
+    ORDER BY ...
+    FETCH FIRST 10 ROWS ONLY
+
+2. TOP (N) PERCENT
+
+    T-SQL:
+    TOP (5) PERCENT
+
+    ANSI SQL:
+    No direct ANSI-standard equivalent.
+    A similar result usually requires:
+    - calculating row counts,
+    - window functions,
+    - subqueries.
+
+3. TOP (N) WITH TIES
+
+    T-SQL:
+    TOP (10) WITH TIES
+
+    ANSI SQL:
+    FETCH FIRST 10 ROWS WITH TIES
+    Supported by many modern databases
+    (PostgreSQL, Oracle, DB2, etc.).
+
+4. OFFSET/FETCH
+
+    T-SQL:
+    ORDER BY ...
+    OFFSET 10 ROWS
+    FETCH NEXT 5 ROWS ONLY
+
+    ANSI SQL:
+    ORDER BY ...
+    OFFSET 10 ROWS
+    FETCH FIRST 5 ROWS ONLY
+    Very similar syntax.
+
+5.  GO
+
+    T-SQL:
+    GO
+
+    ANSI SQL:
+    Not supported.
+
+    GO is a SQL Server client utility command
+    used to separate batches.
+
+    ANSI-Compliant:
+    SELECT
+    FROM
+    ORDER BY
+    OFFSET
+    FETCH
+
+    SQL Server-Specific:
+    TOP
+    TOP PERCENT
+    GO
+
+Partially Portable:
+TOP WITH TIES
+(ANSI equivalent exists using FETCH ... WITH TIES)
+
+Therefore, these queries are NOT completely ANSI SQL.
+Most of the logic is portable, but TOP-related syntax
+must be adjusted when moving to ANSI-compliant systems.
+*/
