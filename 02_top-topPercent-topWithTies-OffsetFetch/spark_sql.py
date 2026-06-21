@@ -120,3 +120,86 @@ LIMIT 15
 """).show()
 # Notes:
 # Direct replacement for TOP (15).
+
+
+# Query 7 (TOP 3 PERCENT Equivalent)
+# Purpose:
+# Retrieve the earliest 3 percent of delivered orders.
+spark.sql("""
+WITH ordered_orders AS (
+    SELECT
+        O.order_id,
+        O.order_delivered_customer_date,
+        ROW_NUMBER() OVER (
+            ORDER BY O.order_delivered_customer_date ASC
+        ) AS rn,
+        COUNT(*) OVER () AS total_rows
+    FROM Orders O
+)
+SELECT
+    order_id,
+    order_delivered_customer_date
+FROM ordered_orders
+WHERE rn <= CEIL(total_rows * 0.03)
+""").show()
+# Notes:
+# Spark SQL does not support TOP (N) PERCENT.
+# ROW_NUMBER() creates a sequence after sorting.
+# COUNT(*) OVER () obtains the total row count.
+# CEIL(total_rows * 0.03) calculates 3 percent of the dataset.
+# The query returns the earliest 3 percent of deliveries.
+# NOTE THAT WE WILL ADDRESS CTE AND WINDOW FUNCTIONS LATER IN DETAIL IN ANOTHER SEPERATE SECTION
+
+
+# Query 8
+# Purpose:
+# Retrieve the 20 highest freight-value order items, including ties.
+spark.sql("""
+WITH ranked_items AS (
+    SELECT
+        OI.order_id,
+        OI.freight_value,
+        RANK() OVER (
+            ORDER BY OI.freight_value DESC
+        ) AS freight_rank
+    FROM Order_Items OI
+)
+SELECT
+    order_id,
+    freight_value
+FROM ranked_items
+WHERE freight_rank <= 20
+""").show()
+# Notes:
+# RANK() is used to mimic WITH TIES behavior.
+# NOTE THAT WE WILL ADDRESS CTE AND WINDOW FUNCTIONS LATER IN DETAIL IN ANOTHER SEPERATE SECTION
+
+
+# Query 9
+# Purpose:
+# Skip the first 20 customers ordered by ZIP code and retrieve the next 10 customers.
+spark.sql("""
+SELECT
+    C.customer_id,
+    C.customer_zip_code_prefix
+FROM Customers C
+ORDER BY C.customer_zip_code_prefix
+LIMIT 10 OFFSET 20
+""").show()
+# Notes:
+# Equivalent to OFFSET 20 FETCH NEXT 10 ROWS ONLY.
+
+
+# Query 10
+# Purpose:
+# Skip the first 50 products ordered by weight and return all remaining products.
+spark.sql("""
+SELECT
+    P.product_id,
+    P.product_weight_g
+FROM Products P
+ORDER BY P.product_weight_g
+OFFSET 50
+""").show()
+# Notes:
+# Equivalent to OFFSET 50 ROWS in SQL Server.
