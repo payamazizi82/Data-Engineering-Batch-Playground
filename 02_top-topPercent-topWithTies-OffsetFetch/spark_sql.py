@@ -87,3 +87,36 @@ LIMIT 5 OFFSET 10
 # Notes:
 # Equivalent to OFFSET 10 FETCH NEXT 5 ROWS ONLY.
 # Requires Spark 3.4+.
+
+
+# Query 5
+# Purpose:
+# Skip the first 10 delivered orders and return all remaining rows.
+spark.sql("""
+SELECT
+    O.customer_id,
+    O.order_id,
+    O.order_status
+FROM Orders O
+ORDER BY O.order_delivered_customer_date
+OFFSET 10
+""").show()
+# Notes:
+# Equivalent to OFFSET 10 ROWS.
+# Supported in modern Spark versions.
+
+
+# Query 6
+# Purpose:
+# Retrieve the 15 most recently approved orders.
+spark.sql("""
+SELECT
+    O.order_id,
+    O.order_approved_at,
+    O.order_status
+FROM Orders O
+ORDER BY O.order_approved_at DESC
+LIMIT 15
+""").show()
+# Notes:
+# Direct replacement for TOP (15).
