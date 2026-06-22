@@ -174,3 +174,33 @@ order_items_df \
 # rank() is used to emulate WITH TIES behavior.
 # We will cover Window Functions later in a dedicated section.
 
+
+# Query 9
+# Purpose:
+# Skip the first 20 customers ordered by ZIP code and retrieve the next 10 customers.
+customers_df \
+    .orderBy("customer_zip_code_prefix") \
+    .limit(30) \
+    .subtract(
+        customers_df
+        .orderBy("customer_zip_code_prefix")
+        .limit(20)
+    ) \
+    .show()
+# Notes:
+# Approximation of LIMIT 10 OFFSET 20.
+
+
+# Query 10
+# Purpose:
+# Skip the first 50 products ordered by weight and return all remaining products.
+products_df \
+    .orderBy("product_weight_g") \
+    .subtract(
+        products_df
+        .orderBy("product_weight_g")
+        .limit(50)
+    ) \
+    .show()
+# Notes:
+# Approximation of OFFSET 50.
