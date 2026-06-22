@@ -203,3 +203,88 @@ OFFSET 50
 """).show()
 # Notes:
 # Equivalent to OFFSET 50 ROWS in SQL Server.
+
+
+# PySpark SQL Notes and Differences from T-SQL
+# -----------------------------------------------------------
+# 1. TOP (N)
+
+# T-SQL:
+# TOP (10)
+
+# PySpark SQL:
+# LIMIT 10
+# -----------------------------------------------------------
+# 2. TOP (N) PERCENT
+
+# T-SQL:
+# TOP (5) PERCENT
+
+# PySpark SQL:
+# No direct equivalent exists.
+# Common approach:
+# ROW_NUMBER()
+# COUNT(*) OVER ()
+
+# Why?
+# * Spark SQL cannot use TOP PERCENT.
+# * Spark SQL cannot dynamically place a subquery inside LIMIT.
+# * Window functions provide a portable solution.
+# -----------------------------------------------------------
+# 3. TOP (N) WITH TIES
+
+# T-SQL:
+# TOP (10) WITH TIES
+
+# PySpark SQL:
+# No direct equivalent exists.
+# Common approaches:
+# RANK()
+# DENSE_RANK()
+
+# Why?
+# * Rows sharing the same ranking value are returned together.
+# * This closely mimics WITH TIES behavior.
+# -----------------------------------------------------------
+# 4. OFFSET/FETCH
+
+# T-SQL:
+# OFFSET 10 ROWS
+# FETCH NEXT 5 ROWS ONLY
+
+# PySpark SQL:
+# LIMIT 5 OFFSET 10
+# -----------------------------------------------------------
+# 5. Window Functions Become More Important
+
+# In T-SQL:
+# TOP
+# TOP PERCENT
+# TOP WITH TIES
+# solve many row-limiting problems directly.
+
+# In Spark SQL:
+# Window functions often replace these features:
+# ROW_NUMBER()
+# RANK()
+# DENSE_RANK()
+# COUNT(*) OVER ()
+# Therefore, window functions are much more important in Spark SQL than in SQL Server for these types of queries.
+# -----------------------------------------------------------
+# Summary
+
+# | T-SQL             | PySpark SQL                     |
+# | ----------------- | ------------------------------- |
+# | TOP (N)           | LIMIT                           |
+# | TOP (N) PERCENT   | ROW_NUMBER() + COUNT(*) OVER () |
+# | TOP (N) WITH TIES | RANK() or DENSE_RANK()          |
+# | OFFSET/FETCH      | LIMIT + OFFSET                  |
+# | GO                | Separate spark.sql() calls      |
+
+# For these queries, the biggest differences are:
+
+# TOP becomes LIMIT.
+# TOP PERCENT requires window functions.
+# TOP WITH TIES requires ranking functions.
+# GO does not exist.
+# Window functions are used much more frequently in Spark SQL.
