@@ -82,3 +82,37 @@ orders_df \
 # Notes:
 # DataFrames do not have a direct FETCH NEXT syntax.
 # This approximates OFFSET/FETCH behavior.
+
+
+# Query 5
+# Purpose:
+# Skip the first 10 delivered orders and return all remaining rows.
+orders_df \
+    .orderBy("order_delivered_customer_date") \
+    .subtract(
+        orders_df
+        .orderBy("order_delivered_customer_date")
+        .limit(10)
+    ) \
+    .show()
+# Notes:
+# DataFrames do not provide a direct OFFSET method.
+# Alternative approaches often use row_number().
+
+
+# Query 6
+# Purpose:
+# Retrieve the 15 most recently approved orders.
+orders_df \
+    .orderBy(
+        F.col("order_approved_at").desc()
+    ) \
+    .limit(15) \
+    .select(
+        "order_id",
+        "order_approved_at",
+        "order_status"
+    ) \
+    .show()
+# Notes:
+# Direct equivalent of LIMIT 15.
