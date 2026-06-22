@@ -116,3 +116,61 @@ orders_df \
     .show()
 # Notes:
 # Direct equivalent of LIMIT 15.
+
+
+# Query 7 (TOP 3 PERCENT Equivalent)
+# Purpose:
+# Retrieve the earliest 3 percent of delivered orders.
+window_spec = Window.orderBy(
+    F.col("order_delivered_customer_date").asc()
+)
+
+orders_df \
+    .withColumn(
+        "rn",
+        F.row_number().over(window_spec)
+    ) \
+    .withColumn(
+        "total_rows",
+        F.count("*").over(Window.partitionBy())
+    ) \
+    .filter(
+        F.col("rn") <= F.ceil(F.col("total_rows") * 0.03)
+    ) \
+    .select(
+        "order_id",
+        "order_delivered_customer_date"
+    ) \
+    .show()
+
+# Notes:
+# DataFrames do not have a TOP PERCENT method.
+# Window functions are used instead.
+# We will cover Window Functions later in a dedicated section.
+
+
+# Query 8 (TOP 20 WITH TIES Equivalent)
+# Purpose:
+# Retrieve the 20 highest freight-value order items, including ties.
+window_spec = Window.orderBy(
+    F.col("freight_value").desc()
+)
+
+order_items_df \
+    .withColumn(
+        "freight_rank",
+        F.rank().over(window_spec)
+    ) \
+    .filter(
+        F.col("freight_rank") <= 20
+    ) \
+    .select(
+        "order_id",
+        "freight_value"
+    ) \
+    .show()
+
+# Notes:
+# rank() is used to emulate WITH TIES behavior.
+# We will cover Window Functions later in a dedicated section.
+
